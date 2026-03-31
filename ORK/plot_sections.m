@@ -1,0 +1,71 @@
+function plot_sections(sections, stages, yscale)
+
+if nargin < 2
+    stages = 1:10;
+end
+
+num_sections = numel(sections);
+
+for section_idx = 1:num_sections
+    if ~isempty(find(stages == sections{section_idx}.stage, 1))
+        x_start = sections{section_idx}.x;
+        break
+    end
+end
+
+for idx = 1:num_sections
+    section = sections{idx};
+
+    if isempty(find(stages == section.stage, 1))
+        continue
+    end
+
+    section.x = section.x - x_start;
+
+    x_points = [section.x, section.x, section.x + section.length, section.x + section.length];
+    y_points = [-section.forerad, section.forerad, section.aftrad+eps, -section.aftrad-eps] / yscale;
+
+    if y_points(1) == y_points(2)
+        y_points = y_points(2:end);
+        x_points = x_points(2:end);
+    end
+
+    if section.material == "Fiberglass"
+        color = [0.7, 0.1, 0.1];
+    elseif section.material == "Cardboard"
+        color = [0.6, 0.4, 0.15];
+    else
+        color = [0.4, 0.4, 0.4];
+    end
+
+    plot(polyshape(x_points, y_points), 'FaceColor', color, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
+
+    if isfield(section, 'subcomponents')
+        subcomponents = section.subcomponents;
+        if isfield(subcomponents, 'trapezoidfinset')
+            finset = section.subcomponents.trapezoidfinset;
+
+            cr = finset.rootchord;
+            ct = finset.tipchord;
+            xr = finset.sweeplength;
+            s  = finset.height;
+
+            x0 = section.x + finset.axialoffset.Text;
+
+            if strcmp(finset.axialoffset.methodAttribute, 'bottom')
+                x0 = x0 + section.length - cr;
+            end
+            
+            x_points = [x0, x0 + xr, x0 + xr + ct, x0 + cr];
+            y_points = [0, s, s, 0] / yscale;
+
+            y_top = section.forerad/yscale + y_points;
+            y_bottom = -y_top;
+
+            plot(polyshape(x_points, y_top), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
+            plot(polyshape(x_points, y_bottom), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
+        end
+    end
+
+end
+end

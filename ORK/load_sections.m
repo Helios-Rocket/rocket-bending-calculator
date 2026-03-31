@@ -1,0 +1,92 @@
+function [sections, rocket_subcomp] = load_sections(ork)
+rocket_subcomp = ork.subcomponents;
+
+stages = rocket_subcomp.stage;
+num_stages = numel(stages);
+
+sections = {};
+section_idx = 1;
+
+x_pos = 0;
+
+for stage_num = 1:num_stages
+    stage = stages(stage_num);
+    stage_subcomp = stage.subcomponents;
+
+    if isfield(stage_subcomp, 'nosecone')
+        nose_length = stage_subcomp.nosecone.length;
+        nose_aft_rad = stage_subcomp.nosecone.aftradius;
+
+        material = stage_subcomp.nosecone.material.Text;
+
+        sections{section_idx} = struct( ...
+            'x', x_pos, ...
+            'length', nose_length, ...
+            'forerad', 0, ...
+            'aftrad', nose_aft_rad, ...
+            'material', material, ...
+            'name', stage_subcomp.nosecone.name, ...
+            'stage', num_stages - stage_num + 1, ...
+            'id', stage_subcomp.nosecone.id);
+        section_idx = section_idx + 1;
+
+        x_pos = x_pos + nose_length;
+    end
+
+    if isfield(stage_subcomp, 'transition')
+        forerad = stage_subcomp.transition.foreradius;
+        if ~isnumeric(forerad)
+            forerad = str2double(erase(forerad, "auto "));
+        end
+
+        aftrad = stage_subcomp.transition.aftradius;
+        if ~isnumeric(aftrad)
+            aftrad = str2double(erase(aftrad, "auto "));
+        end
+
+        trans_length = stage_subcomp.transition.length;
+
+        material = stage_subcomp.transition.material.Text;
+
+        sections{section_idx} = struct( ...
+            'x', x_pos, ...
+            'length', trans_length, ...
+            'forerad', forerad, ...
+            'aftrad', aftrad, ...
+            'material', material, ...
+            'name', stage_subcomp.transition.name, ...
+            'stage', num_stages - stage_num + 1, ...
+            'id', stage_subcomp.transition.id);
+        x_pos = x_pos + trans_length;
+        section_idx = section_idx + 1;
+    end
+
+    bodytubes = stage_subcomp.bodytube;
+    num_bodytubes = numel(bodytubes);
+
+    for bodytube_num = 1:num_bodytubes
+        bodytube = stage_subcomp.bodytube(bodytube_num);
+        tube_length = bodytube.length;
+        width = bodytube.radius;
+        if ~isnumeric(width)
+             width  = str2double(erase(width, "auto "));
+        end
+
+        material = bodytube.material.Text;
+
+        sections{section_idx} = struct( ...
+            'x', x_pos, ...
+            'length', tube_length, ...
+            'forerad', width, ...
+            'aftrad', width, ...
+            'material', material, ...
+            'name', bodytube.name, ...
+            'stage', num_stages - stage_num + 1, ...
+            'subcomponents', bodytube.subcomponents, ...
+            'id', bodytube.id);
+        section_idx = section_idx + 1;
+
+        x_pos = x_pos + tube_length;
+    end
+end
+end

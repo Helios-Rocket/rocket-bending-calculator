@@ -1,0 +1,107 @@
+function [cp_tot, cna_tot, aero_sections, stage_cp_tot, stage_cna_tot] = get_aerodynamics(ork, M, alpha, R_ref, stages)
+
+if nargin < 5
+    stages = 1:10;
+end
+
+sections = load_sections(ork);
+
+num_sections = numel(sections);
+aero_section_idx = 1;
+aero_sections = {};
+
+x_start = 0;
+
+for section_idx = 1:num_sections
+    if ~isempty(find(stages == sections{section_idx}.stage, 1))
+        x_start = sections{section_idx}.x;
+        break
+    end
+end
+
+for section_idx = 1:num_sections
+    section = sections{section_idx};
+
+    if isempty(find(stages == section.stage, 1))
+        continue
+    end
+    
+    section.x = section.x - x_start;
+
+    if section.aftrad == section.forerad
+        % Body Tube
+        CNa = calc_CNa_bodytube(section.aftrad, section.length, R_ref,     alpha);
+        Cp  = calc_CP_bodytube (section.length, section.aftrad, section.x, alpha) + section.x;
+
+        aero_sections{aero_section_idx} = struct('CNa', CNa, 'Cp', Cp, 'name', section.name, 'stage', section.stage, 'id', section.id);
+
+        aero_section_idx = aero_section_idx + 1;
+
+        if isfield(section, 'subcomponents')
+            subcomponents = section.subcomponents;
+            if isfield(subcomponents, 'trapezoidfinset')
+                finset = section.subcomponents.trapezoidfinset;
+
+                fins = struct( ...
+                    'cr',     finset.rootchord, ...
+                    'ct',     finset.tipchord, ...
+                    'xr',     finset.sweeplength, ...
+                    's',      finset.height, ...
+                    'R_body', section.forerad, ...
+                    'R_ref',  R_ref);
+
+                CNa_fins = calc_CNa_fins(fins, M, alpha);
+                Cp_fins  = calc_CP_fins (fins, M);
+
+                Cp_fins = Cp_fins + section.x + finset.axialoffset.Text;
+
+                if strcmp(finset.axialoffset.methodAttribute, 'bottom')
+                    Cp_fins = Cp_fins  + section.length - finset.rootchord;
+                end
+
+
+                aero_sections{aero_section_idx} = struct('CNa', CNa_fins, 'Cp', Cp_fins, 'name', finset.name, 'stage', section.stage, 'id', finset.id);
+                aero_section_idx = aero_section_idx + 1;
+            end
+        end
+    elseif section.forerad == 0
+        % Nosecone
+        CNa_nose = calc_CNa_ogive(section.aftrad, section.length, R_ref, alpha, M);
+        Cp_nose  = calc_CP_ogive (section.length, section.aftrad, R_ref, alpha, M);
+
+        aero_sections{aero_section_idx} = struct('CNa', CNa_nose, 'Cp', Cp_nose, 'name', section.name, 'stage', section.stage, 'id', section.id);
+        aero_section_idx = aero_section_idx + 1;
+    elseif section.forerad < section.aftrad
+        CNa = calc_CNa_shoulder(section.forerad, section.aftrad, R_ref);
+        Cp  = calc_CP_shoulder (section.forerad, section.aftrad, section.length, section.x, alpha);
+
+        aero_sections{aero_section_idx} = struct('CNa', CNa, 'Cp', Cp, 'name', section.name, 'stage', section.stage, 'id', section.id);
+        aero_section_idx = aero_section_idx + 1;
+    end
+end
+
+num_aero_sections = aero_section_idx - 1;
+
+num_stages = numel(ork.subcomponents.stage);
+
+stage_cp_tot  = zeros(num_stages, 1);
+stage_cna_tot = zeros(num_stages, 1);
+
+for n = 1:num_aero_sections
+
+    section = aero_sections{n};
+    CNa = section.CNa;
+    Cp  = section.Cp;
+
+    stage_idx = num_stages - section.stage + 1;
+
+    stage_cp_tot (stage_idx) = stage_cp_tot(stage_idx)  + Cp*CNa;
+    stage_cna_tot(stage_idx) = stage_cna_tot(stage_idx) +    CNa;
+end
+
+cna_tot = sum(stage_cna_tot);
+cp_tot  = sum(stage_cp_tot) / cna_tot;
+
+stage_cp_tot = stage_cp_tot ./ stage_cna_tot;
+
+end
