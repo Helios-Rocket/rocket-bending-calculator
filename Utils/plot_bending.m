@@ -73,14 +73,13 @@ title(ax2, sprintf("%s at %0.2f degrees AOA; Mach %0.2f", ...
 
 uistack(ax1, 'bottom')
 
-fprintf("Rocket  : CP: %0.2f cm; CNa: %0.2f\n", data.cp_tot*100, data.cna_tot);
-
 num_sections = numel(data.aero_sections);
-variable_names = {'Component', 'Cp', 'CNa'};
-rows = {};
+variable_names = {'Component', 'Cp (cm)', 'CNa'};
+rows = {'ROCKET', data.cp_tot*100, data.cna_tot; 
+        '------', '------', '------'};
 
 for n = 1:num_sections
-    rows = [rows; {convertStringsToChars(data.aero_sections{n}.name), data.aero_sections{n}.Cp, data.aero_sections{n}.CNa}];
+    rows = [rows; {convertStringsToChars(data.aero_sections{n}.name), data.aero_sections{n}.Cp*100, data.aero_sections{n}.CNa}];
 end
 
 FormattedTable.Display(variable_names, rows)

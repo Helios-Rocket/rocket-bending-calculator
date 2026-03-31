@@ -6,7 +6,7 @@ function [CNa_T, K_T, B] = calc_CNa_fins(fins, M, alpha)
     R     = fins.R_body;
     R_ref = fins.R_ref;
 
-    n = 4;
+    n = fins.n_fins;
     g = 1.4;
 
     Lambda = atan2(xr + 0.5*(ct - cr), s);
