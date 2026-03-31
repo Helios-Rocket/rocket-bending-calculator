@@ -1,4 +1,10 @@
-function plot_AOA_sweep(num_aoa, max_aoa, v, M0, rho, R_ref, ork, stages, filename)
+function fig_idx = plot_AOA_sweep(num_aoa, max_aoa, v, M0, rho, R_ref, ork, stages, filename, fig_idx0)
+
+if nargin < 10
+    fig_idx0 = 1;
+end
+fig_idx = fig_idx0;
+
 
 aoa_all = linspace(0, max_aoa, num_aoa);
 
@@ -21,30 +27,34 @@ end
 
 %% PLOTTING
 
-plot_bending(ork, M, deg2rad(aoa), stages, data_all{n}, filename);
+plot_bending(ork, M, deg2rad(aoa), stages, data_all{n}, filename, fig_idx);
+fig_idx = fig_idx + 1;
 
-figure(2)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(aoa_all, max_M_all, 'LineWidth', 2);
 title('Max Bending Moment vs AOA')
 xlabel('AOA (deg)')
 ylabel('Max Bending (Nm)')
 
-figure(3)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(aoa_all, cp_all, 'LineWidth', 2);
 title("Cp vs AOA")
 xlabel("AOA (deg)")
 ylabel("Cp (m)")
 
-figure(4)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(aoa_all, cna_all, 'LineWidth', 2)
 title("CN\alpha vs AOA")
 xlabel("AOA (deg)")
 ylabel("CN\alpha")
 
-figure(5); clf; figure(6); clf; figure(7); clf
+figure(fig_idx + 1); clf; figure(fig_idx + 2); clf; figure(fig_idx + 3); clf
 
 num_sections = numel(data.aero_sections);
 colors = turbo(num_sections);
@@ -61,25 +71,28 @@ for k = 1:num_sections
     start = data_all{n}.aero_sections{k}.x;
     the_length = data_all{n}.aero_sections{k}.length;
 
-    figure(5)
+    figure(fig_idx + 1)
     plot(aoa_all, cp_data, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('Cp');
     xlabel('AOA (deg)');
     title('Cp Absolute vs AOA')
     legend
 
-    figure(6)
+    figure(fig_idx + 2)
     plot(aoa_all, 100 * (cp_data - start) / the_length, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('Cp (% Component Length)');
     xlabel('AOA (deg)');
     title('Cp from Component Start vs AOA')
     legend
 
-    figure(7)
+    figure(fig_idx + 3)
     plot(aoa_all, cna_data, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('CN_\alpha')
     xlabel('AOA (deg)');
     title('CN_\alpha vs AOA')
     legend
 end
+
+fig_idx = fig_idx + 4;
+
 end

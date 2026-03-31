@@ -18,19 +18,18 @@ sections = load_sections(ork);
 R_ref = get_R_ref(sections);
 M = v / M0;
 
-%{
-data = run_calc(ork, M, alpha, v, rho, stages, R_ref);
-plot_bending(ork, M, alpha, stages, data, filename);
-%}
+fig_idx = 1;
 
-%{
+data = run_calc(ork, M, alpha, v, rho, stages, R_ref);
+plot_bending(ork, M, alpha, stages, data, filename, fig_idx);
+fig_idx = fig_idx + 1;
+
+
 num_v = 100;
 max_v = 800;
-plot_M_sweep(num_v, max_v, 100, alpha, M0, rho, R_ref, ork, stages, filename)
-%}
+fig_idx = plot_M_sweep(num_v, max_v, 100, alpha, M0, rho, R_ref, ork, stages, filename, fig_idx);
 
-%{
+
 num_aoa = 100;
 max_aoa = 15;
-plot_AOA_sweep(num_aoa, max_aoa, 100, M0, rho, R_ref, ork, stages, filename)
-%}
+fig_idx = plot_AOA_sweep(num_aoa, max_aoa, 100, M0, rho, R_ref, ork, stages, filename, fig_idx);

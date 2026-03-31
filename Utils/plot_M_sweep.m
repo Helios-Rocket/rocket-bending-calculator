@@ -1,4 +1,9 @@
-function plot_M_sweep(num_v, max_v, v0, alpha, M0, rho, R_ref, ork, stages, filename)
+function fig_idx = plot_M_sweep(num_v, max_v, v0, alpha, M0, rho, R_ref, ork, stages, filename, fig_idx0)
+
+if nargin < 11
+    fig_idx0 = 1;
+end
+fig_idx = fig_idx0;
 
 v_all = linspace(0, max_v, num_v);
 
@@ -21,30 +26,34 @@ end
 
 %% PLOTTING
 
-plot_bending(ork, M, alpha, stages, data_all{n}, filename);
+plot_bending(ork, M, alpha, stages, data_all{n}, filename, fig_idx0);
+fig_idx = fig_idx + 1;
 
-figure(2)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(v_all / M0, max_M_all, 'LineWidth', 2);
 title('Max Bending Moment vs Mach Number')
 xlabel('M')
 ylabel('Max Bending (Nm)')
 
-figure(3)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(v_all / M0, cp_all, 'LineWidth', 2);
 title("Cp vs Mach Number")
 xlabel("M")
 ylabel("Cp (m)")
 
-figure(4)
+figure(fig_idx)
+fig_idx = fig_idx + 1;
 clf
 plot(v_all / M0, cna_all, 'LineWidth', 2)
 title("CN\alpha vs Mach Number")
 xlabel("M")
 ylabel("CN\alpha")
 
-figure(5); clf; figure(6); clf; figure(7); clf
+figure(fig_idx + 1); clf; figure(fig_idx + 2); clf; figure(fig_idx + 3); clf
 
 num_sections = numel(data.aero_sections);
 colors = turbo(num_sections);
@@ -61,25 +70,27 @@ for k = 1:num_sections
     start = data_all{n}.aero_sections{k}.x;
     the_length = data_all{n}.aero_sections{k}.length;
 
-    figure(5)
+    figure(fig_idx + 1)
     plot(v_all / M0, cp_data, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('Cp');
     xlabel('Mach Number');
     title('Cp Absolute vs Mach')
     legend
 
-    figure(6)
+    figure(fig_idx + 2)
     plot(v_all / M0, 100 * (cp_data - start) / the_length, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('Cp (% Component Length)');
     xlabel('Mach Number');
     title('Cp from Component Start vs Mach')
     legend
 
-    figure(7)
+    figure(fig_idx + 3)
     plot(v_all / M0, cna_data, 'LineWidth', lw, 'DisplayName', name, 'Color', colors(k, :)); hold on
     ylabel('CN_\alpha')
     xlabel('Mach Number');
     title('CN_\alpha vs Mach')
     legend
 end
+fig_idx = fig_idx + 4;
+
 end
