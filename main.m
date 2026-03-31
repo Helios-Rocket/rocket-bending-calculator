@@ -7,10 +7,10 @@ alpha = deg2rad(10);
 
 stages = [1, 2];
 
-% filename = "HeliosRocketV3.ork";
+filename = "HeliosRocketV3.ork";
 % filename = "Voyager rough canards v2 (1).ork";
 % filename = "V9 (2-Stage 6in) Test Rocket.ork";
-filename   = "V4 (30k) RAS Test Rocket.ork";
+% filename   = "V4 (30k) RAS Test Rocket.ork";
 ork = load_ork(filename);
 sections = load_sections(ork);
 num_sections = numel(sections);
