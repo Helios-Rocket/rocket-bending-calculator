@@ -139,7 +139,15 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
             m = volume * component.material.densityAttribute;
         elseif isfield(component, 'packedradius')
-            area = pi * component.packedradius^2;
+            
+            packedradius = component.packedradius;
+
+            if ~isnumeric(packedradius)
+                packedradius = str2double(erase(packedradius, 'auto '));
+            end
+
+
+            area = pi * packedradius^2;
             volume = area * component.packedlength;
 
             m = volume * component.material.densityAttribute;
