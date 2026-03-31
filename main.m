@@ -23,7 +23,14 @@ data = run_calc(ork, M, alpha, v, rho, stages, R_ref);
 plot_bending(ork, M, alpha, stages, data, filename);
 %}
 
-
+%{
 num_v = 100;
 max_v = 800;
 plot_M_sweep(num_v, max_v, 100, alpha, M0, rho, R_ref, ork, stages, filename)
+%}
+
+%{
+num_aoa = 100;
+max_aoa = 15;
+plot_AOA_sweep(num_aoa, max_aoa, 100, M0, rho, R_ref, ork, stages, filename)
+%}
