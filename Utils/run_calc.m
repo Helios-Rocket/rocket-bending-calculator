@@ -1,4 +1,6 @@
-function data_out = run_calc(ork, Mach, alpha, v, rho, stages, R_ref, S, num_points)
+function data_out = run_calc(ork, Mach, alpha, v, rho, stages, R_ref, num_points)
+
+S = pi * R_ref^2;
 
 [cp_tot, cna_tot, aero_sections, stage_cp_tot, stage_cna_tot] = get_aerodynamics(ork, Mach, alpha, R_ref, stages);
 
