@@ -3,8 +3,8 @@ clear; clc;
 M0 = 340.3; % Mach at sea level [m/s]
 rho = 1.225; % [kg m^-3]
 
-alpha = deg2rad(6);
-v = M0*0.8;
+alpha = deg2rad(6); % Angle of Attack
+v = 100; % Speed
 
 stages = [1, 2];
 
@@ -20,11 +20,11 @@ R_ref = get_R_ref(sections);
 M = v / M0;
 
 fig_idx = 1;
-%{
 data = run_calc(ork, M, alpha, v, rho, stages, R_ref);
 plot_bending(ork, M, alpha, stages, data, filename, fig_idx);
 fig_idx = fig_idx + 1;
-%}
+
+%{
 num = 50;
 
 v_all =         linspace(0.5*M0, 1.5*M0, num);
@@ -82,3 +82,4 @@ fig_idx = plot_M_sweep(num_v, max_v, 100, alpha, M0, rho, R_ref, ork, stages, fi
 num_aoa = 100;
 max_aoa = 6;
 fig_idx = plot_AOA_sweep(num_aoa, max_aoa, 100, M0, rho, R_ref, ork, stages, filename, fig_idx);
+%}
