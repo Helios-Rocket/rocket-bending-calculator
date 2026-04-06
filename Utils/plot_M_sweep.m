@@ -48,10 +48,23 @@ ylabel("Cp (m)")
 figure(fig_idx)
 fig_idx = fig_idx + 1;
 clf
-plot(v_all / M0, cna_all, 'LineWidth', 2)
+
+lw = 3;
+
+plot(v_all / M0, cna_all, 'LineWidth', lw, 'DisplayName', 'WillGPT'); hold on
+
+data_sims = readtable('Test_Data/Mach.csv');
+
+plot(data_sims.Mach, data_sims.CFD, 'LineWidth', 2, 'DisplayName', 'CFD');
+plot(data_sims.Mach, data_sims.RasAero, 'LineWidth', 2, 'DisplayName', 'RasAero');
+plot(data_sims.Mach, data_sims.OpenRocket, 'LineWidth', 2, 'DisplayName', 'OpenRocket');
+
+legend
 title("CN\alpha vs Mach Number")
 xlabel("M")
 ylabel("CN\alpha")
+
+xlim([0.5, 1.5])
 
 figure(fig_idx + 1); clf; figure(fig_idx + 2); clf; figure(fig_idx + 3); clf
 

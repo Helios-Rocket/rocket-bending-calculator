@@ -46,10 +46,23 @@ title("Cp vs AOA")
 xlabel("AOA (deg)")
 ylabel("Cp (m)")
 
+
 figure(fig_idx)
 fig_idx = fig_idx + 1;
 clf
-plot(aoa_all, cna_all, 'LineWidth', 2)
+
+lw = 3;
+plot(aoa_all, cna_all, 'LineWidth', lw, 'DisplayName', 'WillGPT'); hold on
+
+data_sims = readtable('Test_Data/AoA.csv');
+
+plot(data_sims.AoA, data_sims.CFD, 'LineWidth', 2, 'DisplayName', 'CFD');
+% plot(data_sims.AoA, data_sims.RasAero, 'LineWidth', 2, 'DisplayName', 'RasAero');
+plot(data_sims.AoA, data_sims.OpenRocket, 'LineWidth', 2, 'DisplayName', 'OpenRocket');
+
+plot(4, 20.794, '.k', 'MarkerSize', 20, 'DisplayName', 'RAS')
+
+legend
 title("CN\alpha vs AOA")
 xlabel("AOA (deg)")
 ylabel("CN\alpha")

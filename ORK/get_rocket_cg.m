@@ -168,6 +168,10 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         
         cg_x = x + cg_loc;
 
+        if isa(m, 'missing')
+            m = 0;
+        end
+
         cg_num = cg_x*m;
         cg_den = m;
 
@@ -177,10 +181,6 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
         part = {cg_x, m, x_end, component.id, component.name};
         parts = part;
-
-        if strcmp(component.name, '54mm Adapter Tube')
-            disp('!')
-        end
 
         if isfield(component, 'subcomponents')
             subc_list = component.subcomponents;
