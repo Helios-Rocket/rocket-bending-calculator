@@ -8,7 +8,12 @@ v = 100; % Speed
 
 stages = [1, 2];
 
-filename = "HeliosRocketV3.ork";
+% filename = "HeliosRocketV3.ork";uu
+
+[file, path] = uigetfile('*.ork');
+
+filename = fullfile(path, file);
+
 % filename = "Voyager rough canards v2 (2).ork";
 % filename = "V9 (2-Stage 6in) Test Rocket.ork";
 % filename   = "V4 (30k) RAS Test Rocket.ork";
