@@ -1,18 +1,17 @@
 clear; clc;
 
 M0 = 340.3; % Mach at sea level [m/s]
-rho = 1.225; % [kg m^-3]
+rho = 0.95; % [kg m^-3]
 
-alpha = deg2rad(6); % Angle of Attack
-v = 100; % Speed
+alpha = deg2rad(16); % Angle of Attack
+v = 2*M0; % Speed
 
 stages = [1, 2];
 
-% filename = "HeliosRocketV3.ork";uu
+filename = "HeliosRocketV3.ork";
 
-[file, path] = uigetfile('*.ork');
-
-filename = fullfile(path, file);
+% [file, path] = uigetfile('*.ork');
+% filename = fullfile(path, file);
 
 % filename = "Voyager rough canards v2 (2).ork";
 % filename = "V9 (2-Stage 6in) Test Rocket.ork";

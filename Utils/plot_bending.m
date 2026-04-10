@@ -5,6 +5,7 @@ if nargin < 7
 end
 
 fig = figure(fig_idx);
+fig_idx = fig_idx + 1;
 clf
 
 ax1 = axes( ...
@@ -84,4 +85,71 @@ end
 
 FormattedTable.Display(variable_names, rows)
 
+%% SECOND PLOT
+fig = figure(fig_idx);
+clf
+
+ax1 = axes( ...
+    'Parent', fig, ...
+    'XAxisLocation', 'bottom', ...
+    'YAxisLocation', 'right', ...
+    'Box', 'off');
+
+hold(ax1, 'on')
+
+axes(ax1)
+plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg, data.stage_cp_tot, false)
+
+ax1.XLim = [0, data.rocket_length];
+axis(ax1, 'equal')
+ax1.XLim = [0, data.rocket_length];
+
+drawnow
+
+ax1.PlotBoxAspectRatioMode = 'manual';
+ax1.PositionConstraint = 'innerposition';
+
+ax2 = axes( ...
+    'Parent', fig, ...
+    'Position', ax1.Position, ...
+    'XAxisLocation', 'bottom', ...
+    'YAxisLocation', 'left', ...
+    'Color', 'none', ...
+    'Box', 'off');
+
+hold(ax2, 'on')
+
+data.stress_all(~isfinite(data.stress_all)) = 0;
+
+plot(ax2, data.points, data.stress_all / 1e6, '-k', ...
+    'LineWidth', 1.5, ...
+    'DisplayName', 'Bending Moment');
+
+
+ax2.XLim = [0, data.rocket_length];
+%{
+ax2.YLim = [-1, 1] * max([ ...
+    abs(data.bending_all(:,1)); ...
+    abs(data.shear_all(:,1)); ...
+    1e-6 ]);
+%}
+ax2.PositionConstraint = 'innerposition';
+ax2.PlotBoxAspectRatioMode = 'manual';
+ax2.PlotBoxAspectRatio = ax1.PlotBoxAspectRatio;
+ax2.Position = ax1.Position;
+
+linkaxes([ax1 ax2], 'x')
+
+set(ax1, 'YColor', 'none')
+set(ax1, 'XColor', 'none')
+
+xlabel(ax2, "Position (m)")
+ylabel(ax2, "Stress (MPa)")
+title("Stress vs. Position")
+
+legend(ax2, [findobj(ax2,'-property','DisplayName'); ...
+             findobj(ax1,'-property','DisplayName')])
+
+figure(3)
+plot(data.points, data.thickness)
 end

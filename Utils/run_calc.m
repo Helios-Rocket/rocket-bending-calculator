@@ -35,6 +35,8 @@ points = linspace(0, rocket_length, num_points);
 
 shear_all   = zeros(num_points, 1);
 bending_all = zeros(num_points, 4);
+stress_all  = zeros(num_points, 1);
+thickness_all = zeros(num_points, 1);
 
 for n = 1:num_points
     xk = points(n);
@@ -43,6 +45,10 @@ for n = 1:num_points
 
     shear_all(n) = V;
     bending_all(n, :) = [M, trans_term, rot_term, lift_term];
+    [D, d] = get_diameter_at_pos(aero_sections, xk);
+    stress_all(n) = calc_tube_force(M, D, d);
+
+    thickness_all(n) = D - d;
 end
 
 data_out = struct( ...
@@ -59,7 +65,9 @@ data_out.aero_sections =  aero_sections;
 data_out.parts_all     =  parts_all;
 data_out.shear_all     =  shear_all;
 data_out.bending_all   =  bending_all;
+data_out.stress_all    = stress_all;
 data_out.points        = points;
+data_out.thickness     = thickness_all;
 
 
 end
