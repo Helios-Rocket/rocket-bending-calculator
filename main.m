@@ -1,14 +1,14 @@
 clear; clc;
-
+SetupEnv;
 M0 = 340.3; % Mach at sea level [m/s]
 rho = 0.95; % [kg m^-3]
 
-alpha = deg2rad(16); % Angle of Attack
-v = 2*M0; % Speed
+alpha = deg2rad(8); % Angle of Attack
+v = 0.9*M0; % Speed
 
-stages = [1, 2];
+stages = [1];
 
-filename = "HeliosRocketV3.ork";
+filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\L1-L2 Testbed (Hornet)\l2.ork";
 
 % [file, path] = uigetfile('*.ork');
 % filename = fullfile(path, file);
@@ -17,6 +17,7 @@ filename = "HeliosRocketV3.ork";
 % filename = "V9 (2-Stage 6in) Test Rocket.ork";
 % filename   = "V4 (30k) RAS Test Rocket.ork";
 % filename = "Rocket 2024-2025_V17.ork";
+
 ork = load_ork(filename);
 sections = load_sections(ork);
 
