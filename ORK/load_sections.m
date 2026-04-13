@@ -21,7 +21,7 @@ for stage_num = 1:num_stages
 
         if strcmp(name, 'nosecone')
             nose_length = stage_subcomp.nosecone.length;
-            nose_aft_rad = stage_subcomp.nosecone.aftradius;
+            nose_aft_rad = remove_auto(stage_subcomp.nosecone.aftradius);
 
             material = stage_subcomp.nosecone.material.Text;
 
@@ -40,15 +40,9 @@ for stage_num = 1:num_stages
         end
 
         if strcmp(name, 'transition')
-            forerad = stage_subcomp.transition.foreradius;
-            if ~isnumeric(forerad)
-                forerad = str2double(erase(forerad, "auto "));
-            end
+            forerad = remove_auto(stage_subcomp.transition.foreradius);
 
-            aftrad = stage_subcomp.transition.aftradius;
-            if ~isnumeric(aftrad)
-                aftrad = str2double(erase(aftrad, "auto "));
-            end
+            aftrad = remove_auto(stage_subcomp.transition.aftradius);
 
             trans_length = stage_subcomp.transition.length;
 
@@ -63,7 +57,8 @@ for stage_num = 1:num_stages
                 'name', stage_subcomp.transition.name, ...
                 'stage', num_stages - stage_num + 1, ...
                 'id', stage_subcomp.transition.id, ...
-                'outer_radius', min(forerad, aftrad) + stage_subcomp.transition.thickness);
+                'outer_radius', min(forerad, aftrad) + stage_subcomp.transition.thickness, ...
+                'subcomponents', stage_subcomp.transition.subcomponents);
             x_pos = x_pos + trans_length;
             section_idx = section_idx + 1;
         end
@@ -75,10 +70,7 @@ for stage_num = 1:num_stages
             for bodytube_num = 1:num_bodytubes
                 bodytube = stage_subcomp.bodytube(bodytube_num);
                 tube_length = bodytube.length;
-                width = bodytube.radius;
-                if ~isnumeric(width)
-                    width  = str2double(erase(width, "auto "));
-                end
+                width = remove_auto(bodytube.radius);
 
                 material = bodytube.material.Text;
 

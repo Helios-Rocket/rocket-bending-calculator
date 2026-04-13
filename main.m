@@ -3,12 +3,12 @@ SetupEnv;
 M0 = 340.3; % Mach at sea level [m/s]
 rho = 0.95; % [kg m^-3]
 
-alpha = deg2rad(8); % Angle of Attack
-v = 0.9*M0; % Speed
+alpha = deg2rad(15); % Angle of Attack
+v = 1.5*M0; % Speed
 
 stages = [1];
 
-filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\L1-L2 Testbed (Hornet)\l2.ork";
+filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\Fiberglass Testbed\fiberglass-testbed.ork";
 
 % [file, path] = uigetfile('*.ork');
 % filename = fullfile(path, file);

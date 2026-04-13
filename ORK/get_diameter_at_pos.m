@@ -16,13 +16,13 @@ function [D, d] = get_diameter_at_pos(sections, x)
             diff = (section.D - section.d);
             if diff > 0.02 
                 section.D = inf;
-            else
-
-            while section.length < 0.06
-                n = n - 1;
-                section = sections{n};
-                diff = (section.D - section.d);
-            end
+            % else
+            % 
+            % while section.length < 0.06
+            %     n = n - 1;
+            %     section = sections{n};
+            %     diff = (section.D - section.d);
+            % end
             end
 
             section = sections{n};

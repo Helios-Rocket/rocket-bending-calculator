@@ -64,6 +64,15 @@ for idx = 1:num_sections
 
             plot(polyshape(x_points, y_top), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
             plot(polyshape(x_points, y_bottom), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
+        elseif isfield(subcomponents, 'freeformfinset')
+            finset = section.subcomponents.freeformfinset;
+
+            x0 = section.x + section.length + finset.axialoffset.Text - tail([section.subcomponents.freeformfinset.finpoints.point.xAttribute]',1);
+            x_points = [section.subcomponents.freeformfinset.finpoints.point.xAttribute] + x0;
+            y_points = ([section.subcomponents.freeformfinset.finpoints.point.yAttribute] + section.forerad) / yscale;
+
+            plot(polyshape(x_points, y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
+            plot(polyshape(x_points, -y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
         end
     end
 

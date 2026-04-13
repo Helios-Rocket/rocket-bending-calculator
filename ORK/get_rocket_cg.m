@@ -79,18 +79,10 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         radius = 0;
 
         if isfield(component, 'outerradius')
-            radius = component.outerradius;
+            radius = remove_auto(component.outerradius);
 
-            if ~isnumeric(radius)
-                if strcmp(radius, 'auto')
-                    radius = parent_radius;
-                end
-            end
         elseif isfield(component, 'radius')
-            radius = component.radius;
-            if ~isnumeric(radius)
-                radius = str2double(erase(radius, 'auto '));
-            end
+            radius = remove_auto(component.radius);
         end
 
         if isfield(component, 'mass')
@@ -98,13 +90,18 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         elseif isfield(component, 'overridemass')
             m = component.overridemass;
         elseif isfield(component, 'fincount')
-            area = 0.5 * (component.rootchord + component.tipchord) * component.height;
+            k = 0.6;
+            if(isfield(component, 'finpoints')) % if fins are freeform
+                area = polyarea([component.finpoints.point.xAttribute],[component.finpoints.point.yAttribute]);
+                fillet_volume = k * tail([component.finpoints.point.xAttribute]',1) * component.filletradius^2 * (1 - pi/4);
+            else
+                area = 0.5 * (component.rootchord + component.tipchord) * component.height;
+                fillet_volume = k * component.rootchord * component.filletradius^2 * (1 - pi/4);
+            end
             volume = area * component.thickness;
 
             m_fin = volume * component.material.densityAttribute;
-
-            k = 0.6;
-            fillet_volume = k * component.rootchord * component.filletradius^2 * (1 - pi/4);
+            
             m_fillet      = fillet_volume * component.filletmaterial.densityAttribute;
 
             m = m_fin + m_fillet*2;

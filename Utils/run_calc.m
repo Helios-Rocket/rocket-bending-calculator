@@ -28,7 +28,7 @@ end
 %}
 
 if nargin < 9
-    num_points = 1000;
+    num_points = 900;
 end
 
 points = linspace(0, rocket_length, num_points);

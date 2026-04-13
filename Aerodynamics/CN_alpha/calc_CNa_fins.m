@@ -1,18 +1,39 @@
 function [CNa_T, K_T, B] = calc_CNa_fins(fins, M, alpha)
-    cr    = fins.cr;
-    ct    = fins.ct;
-    xr    = fins.xr;
-    s     = fins.s;
+    if isfield(fins,'xPt') % Free-form fins (ONLY GUARANTEED TO WORK IF FULLY CONVEX)
+        finGon = polyshape(fins.xPt,fins.yPt);
+        A_fin = area(finGon);
+
+        % same process as in calc_CP_fins.m, but for a set of y coords
+        y1 = fins.yPt(1:end-1);
+        y2 = fins.yPt(2:end);
+        C = 0:0.01:(max(fins.yPt)-0.01);
+        chordlines = zeros(2,size(C,2));
+        for i=1:1:size(C,2)
+            mask = (C(i) >= min(y1,y2)) & (C(i) <= max(y1,y2)) & (y1 ~= y2);
+            t = (C(i) - y1(mask)) ./ (y2(mask) - y1(mask));
+            chordlines(:,i) = fins.xPt(mask) + t .* (fins.xPt(find(mask)+1) - fins.xPt(mask));
+        end
+        midpoints = (chordlines(1,:)+chordlines(2,:))./2;
+        angles = atan2(C,midpoints);
+        Lambda = mean(angles);
+        s = max(fins.yPt);
+
+    else
+        cr    = fins.cr;
+        ct    = fins.ct;
+        xr    = fins.xr;
+        s     = fins.s;
+    
+        Lambda = atan2(xr + 0.5*(ct - cr), s);
+    
+        A_fin = 0.5 * (cr + ct) * s;
+    end
     R     = fins.R_body;
     R_ref = fins.R_ref;
+    A_ref = pi * R_ref^2;
 
     n = fins.n_fins;
     g = 1.4;
-
-    Lambda = atan2(xr + 0.5*(ct - cr), s);
-
-    A_fin = 0.5 * (cr + ct) * s;
-    A_ref = pi * R_ref^2;
 
     M_crit = 1 / cos(Lambda);
     dM = 0.5;
