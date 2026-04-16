@@ -4,7 +4,7 @@ if nargin < 3
     verbose = false;
 end
 
-[cg_num, cg_den, parts] = get_component_cg(ork.subcomponents, 0, 0);
+[cg_num, cg_den, parts] = get_component_cg(ork, 0, 0);
 
 cg = cg_num / cg_den;
 mass  = cg_den;
@@ -13,13 +13,12 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
     function [cg_num, cg_den, parts] = get_component_cg(component, x0, parent_length, parent_radius)
 
-        if isfield(component, 'stage')
-            stages = component.stage;
+        if isfield(component, 'Components')
             cg_num = 0;
             cg_den = 0;
             x      = 0;
             parts = {};
-            num_stages = numel(stages);
+            num_stages = numel(component);
             for n = 1:num_stages
                 stage_idx = num_stages + 1 - n;
                 if length(target_stages) > 1
@@ -31,9 +30,9 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
                         continue
                     end
                 end
-                comp_length = get_component_length(stages(n));
+                comp_length = get_component_length(component(n));
 
-                [cg_num_s, cg_den_s, stage_parts] = get_component_cg(stages(n), x, comp_length);
+                [cg_num_s, cg_den_s, stage_parts] = get_component_cg(component(n).Components, x, comp_length);
 
                 for i = 1:length(stage_parts)
                     stage_parts{i, 6} = n;
@@ -49,11 +48,16 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
             return
         end
 
+        if isfield(component,'Data')
+            comp = component.Data;
+        else
+            comp = component;
+        end
 
-        if isfield(component, 'length')
-            comp_length = component.length;
-        elseif isfield(component, 'packedlength')
-            comp_length = component.packedlength;
+        if isfield(comp, 'length')
+            comp_length = comp.length;
+        elseif isfield(comp, 'packedlength')
+            comp_length = comp.packedlength;
         else
             comp_length = 0;
         end
@@ -63,81 +67,81 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
         x = x0;
 
-        if isfield(component, 'axialoffset')
-            x = x + component.axialoffset.Text;
-            if strcmp(component.axialoffset.methodAttribute, 'bottom')
+        if isfield(comp, 'axialoffset')
+            x = x + comp.axialoffset.Text;
+            if strcmp(comp.axialoffset.method, 'bottom')
                 x = x - comp_length + parent_length;
-            elseif strcmp(component.axialoffset.methodAttribute, 'middle')
+            elseif strcmp(component.axialoffset.method, 'middle')
                 x = x + parent_length/2;
                 cg_loc = 0;
                 end_length = comp_length/2;
-            elseif strcmp(component.axialoffset.methodAttribute, 'absolute')
+            elseif strcmp(component.axialoffset.method, 'absolute')
                 x = x - x0;
             end
         end
 
         radius = 0;
 
-        if isfield(component, 'outerradius')
-            radius = remove_auto(component.outerradius);
+        if isfield(comp, 'outerradius')
+            radius = remove_auto(comp.outerradius);
 
-        elseif isfield(component, 'radius')
-            radius = remove_auto(component.radius);
+        elseif isfield(comp, 'radius')
+            radius = remove_auto(comp.radius);
         end
 
-        if isfield(component, 'mass')
-            m = component.mass;
-        elseif isfield(component, 'overridemass')
-            m = component.overridemass;
-        elseif isfield(component, 'fincount')
+        if isfield(comp, 'mass')
+            m = comp.mass;
+        elseif isfield(comp, 'overridemass')
+            m = comp.overridemass;
+        elseif isfield(comp, 'fincount')
             k = 0.6;
-            if(isfield(component, 'finpoints')) % if fins are freeform
-                area = polyarea([component.finpoints.point.xAttribute],[component.finpoints.point.yAttribute]);
-                fillet_volume = k * tail([component.finpoints.point.xAttribute]',1) * component.filletradius^2 * (1 - pi/4);
+            if(isfield(comp, 'finpoints')) % if fins are freeform
+                area = polyarea([comp.finpoints.point.x],[comp.finpoints.point.y]);
+                fillet_volume = k * tail([comp.finpoints.point.x]',1) * comp.filletradius^2 * (1 - pi/4);
             else
-                area = 0.5 * (component.rootchord + component.tipchord) * component.height;
-                fillet_volume = k * component.rootchord * component.filletradius^2 * (1 - pi/4);
+                area = 0.5 * (comp.rootchord + comp.tipchord) * comp.height;
+                fillet_volume = k * comp.rootchord * comp.filletradius^2 * (1 - pi/4);
             end
-            volume = area * component.thickness;
+            volume = area * comp.thickness;
 
-            m_fin = volume * component.material.densityAttribute;
+            m_fin = volume * comp.material.density;
             
-            m_fillet      = fillet_volume * component.filletmaterial.densityAttribute;
+            m_fillet      = fillet_volume * comp.filletmaterial.density;
 
             m = m_fin + m_fillet*2;
 
-            m = m * component.fincount;
-        elseif isfield(component, 'outerradius')
+            m = m * comp.fincount;
+        elseif isfield(comp, 'outerradius')
             if ~isnumeric(radius)
                 m = 0;
             else
                 area = pi*radius^2;
-                volume = area * component.length;
+                volume = area * comp.length;
 
-                if isfield(component, 'thickness')
-                    inner_area = pi*(radius - component.thickness)^2;
-                    inner_volume = inner_area * component.length;
+                if isfield(comp, 'thickness')
+                    inner_area = pi*(radius - comp.thickness)^2;
+                    inner_volume = inner_area * comp.length;
 
                     volume = volume - inner_volume;
                 end
 
-                m = volume * component.material.densityAttribute;
+                m = volume * comp.material.density;
             end
-        elseif isfield(component, 'radius')
+        elseif isfield(comp, 'radius')
             area = pi*radius^2;
-            volume = area * component.length;
+            volume = area * comp.length;
 
-            if isfield(component, 'thickness')
-                inner_area = pi*(radius - component.thickness)^2;
-                inner_volume = inner_area * component.length;
+            if isfield(comp, 'thickness')
+                inner_area = pi*(radius - comp.thickness)^2;
+                inner_volume = inner_area * comp.length;
 
                 volume = volume - inner_volume;
             end
 
-            m = volume * component.material.densityAttribute;
-        elseif isfield(component, 'packedradius')
+            m = volume * comp.material.density;
+        elseif isfield(comp, 'packedradius')
             
-            packedradius = component.packedradius;
+            packedradius = comp.packedradius;
 
             if ~isnumeric(packedradius)
                 packedradius = str2double(erase(packedradius, 'auto '));
@@ -145,19 +149,19 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
 
             area = pi * packedradius^2;
-            volume = area * component.packedlength;
+            volume = area * comp.packedlength;
 
-            m = volume * component.material.densityAttribute;
+            m = volume * comp.material.density;
         else
             m = 0;
         end
 
         if verbose
-            fprintf("%s : %0.2f cm\n", component.name, x*100)
+            fprintf("%s : %0.2f cm\n", comp.name, x*100)
         end
 
-        if isfield(component, 'shape')
-            if strcmp(component.shape, 'ogive')
+        if isfield(comp, 'shape')
+            if strcmp(comp.shape, 'ogive')
                 cg_loc = comp_length * 2/3;
             end
         end
@@ -176,11 +180,11 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
             fprintf("\t %0.2f g; %0.2f cm\n\n", m*1000, cg_x*100)
         end
 
-        part = {cg_x, m, x_end, component.id, component.name};
+        part = {cg_x, m, x_end, comp.id, comp.name};
         parts = part;
 
-        if isfield(component, 'subcomponents')
-            subc_list = component.subcomponents;
+        if isfield(comp, 'subcomponents')
+            subc_list = comp.subcomponents;
 
             fields = fieldnames(subc_list);
             length_before = 0;

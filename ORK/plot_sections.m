@@ -52,7 +52,7 @@ for idx = 1:num_sections
 
             x0 = section.x + finset.axialoffset.Text;
 
-            if strcmp(finset.axialoffset.methodAttribute, 'bottom')
+            if strcmp(finset.axialoffset.method, 'bottom')
                 x0 = x0 + section.length - cr;
             end
             
@@ -67,9 +67,9 @@ for idx = 1:num_sections
         elseif isfield(subcomponents, 'freeformfinset')
             finset = section.subcomponents.freeformfinset;
 
-            x0 = section.x + section.length + finset.axialoffset.Text - tail([section.subcomponents.freeformfinset.finpoints.point.xAttribute]',1);
-            x_points = [section.subcomponents.freeformfinset.finpoints.point.xAttribute] + x0;
-            y_points = ([section.subcomponents.freeformfinset.finpoints.point.yAttribute] + section.forerad) / yscale;
+            x0 = section.x + section.length + finset.axialoffset.Text - tail([section.subcomponents.freeformfinset.finpoints.point.x]',1);
+            x_points = [section.subcomponents.freeformfinset.finpoints.point.x] + x0;
+            y_points = ([section.subcomponents.freeformfinset.finpoints.point.y] + section.forerad) / yscale;
 
             plot(polyshape(x_points, y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
             plot(polyshape(x_points, -y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on

@@ -2,7 +2,7 @@ function plot_rocket(filename, stages, yscale, ork, cp_tot, cg, stage_cp_tot, dr
 plot_ork(filename, stages, yscale);
 
 num_stages = numel(stages);
-num_stages_real = numel(ork.subcomponents.stage);
+num_stages_real = numel(ork);
 colors = turbo(num_stages + 1);
 lw = 3;
 
@@ -14,7 +14,7 @@ if draw_cps
 
     for n = 1:num_stages
         stage_idx = num_stages_real - stages(n) + 1;
-        xline(stage_cp_tot(n), 'Color', colors(1+n, :), 'LineWidth', lw, 'DisplayName', sprintf("CP; %s", ork.subcomponents.stage(stage_idx).name));
+        xline(stage_cp_tot(n), 'Color', colors(1+n, :), 'LineWidth', lw, 'DisplayName', sprintf("CP; Stage %d", stage_idx));
     end
 end
 

@@ -4,7 +4,7 @@ S = pi * R_ref^2;
 
 [cp_tot, cna_tot, aero_sections, stage_cp_tot, stage_cna_tot] = get_aerodynamics(ork, Mach, alpha, R_ref, stages);
 
-[cg, mass, parts_all, I] = get_rocket_cg(ork, stages);
+[cg, mass, parts_all, I] = get_rocket_cg(ork, stages, 1);
 
 parts = cell2mat(parts_all(:, 1:3));
 
@@ -28,7 +28,7 @@ end
 %}
 
 if nargin < 9
-    num_points = 900;
+    num_points = 1000;
 end
 
 points = linspace(0, rocket_length, num_points);

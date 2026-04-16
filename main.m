@@ -6,9 +6,10 @@ rho = 0.95; % [kg m^-3]
 alpha = deg2rad(15); % Angle of Attack
 v = 1.5*M0; % Speed
 
-stages = [1];
+stages = [1 2];
 
-filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\Fiberglass Testbed\fiberglass-testbed.ork";
+% filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\K2050 Submin\E.ork";
+filename = "C:\Users\thewo\Downloads\HeliosRocketV3.ork";
 
 % [file, path] = uigetfile('*.ork');
 % filename = fullfile(path, file);

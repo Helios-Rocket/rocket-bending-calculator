@@ -47,7 +47,7 @@ for section_idx = 1:num_sections
             Cp_fins = Cp_fins + section.x + finset.axialoffset.Text;
             x_pos = section.x + finset.axialoffset.Text;
 
-            if strcmp(finset.axialoffset.methodAttribute, 'bottom')
+            if strcmp(finset.axialoffset.method, 'bottom')
                 Cp_fins = Cp_fins  + section.length - finset.rootchord;
                 x_pos = x_pos + section.length - finset.rootchord;
             end
@@ -113,8 +113,8 @@ for section_idx = 1:num_sections
             'id', section.id, ...
             'x', section.x, ...
             'length', section.length, ...
-            'd', section.forerad*2, ...
-            'D', section.outer_radius*2);
+            'd', section.inner_radius*2, ...
+            'D', section.forerad*2);
 
         aero_section_idx = aero_section_idx + 1;
 
@@ -169,7 +169,7 @@ end
 
 num_aero_sections = aero_section_idx - 1;
 
-num_stages = numel(ork.subcomponents.stage);
+num_stages = numel(ork);
 
 stage_cp_tot  = zeros(num_stages, 1);
 stage_cna_tot = zeros(num_stages, 1);
