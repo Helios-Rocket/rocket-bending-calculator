@@ -1,5 +1,4 @@
-function plot_ork(filename, stages, yscale)
-ork = load_ork(filename);
+function plot_ork(ork, stages, yscale)
 
 if nargin < 2
     stages = 1:10;

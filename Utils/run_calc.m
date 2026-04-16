@@ -1,10 +1,10 @@
-function data_out = run_calc(ork, Mach, alpha, v, rho, stages, R_ref, num_points)
+function data_out = run_calc(ork, sections, Mach, alpha, v, rho, stages, R_ref, num_points)
 
 S = pi * R_ref^2;
 
-[cp_tot, cna_tot, aero_sections, stage_cp_tot, stage_cna_tot] = get_aerodynamics(ork, Mach, alpha, R_ref, stages);
+[cp_tot, cna_tot, aero_sections] = get_aerodynamics(sections, Mach, alpha, R_ref);
 
-[cg, mass, parts_all, I] = get_rocket_cg(ork, stages, 1);
+[cg, mass, parts_all, I] = get_rocket_cg(ork, 0);
 
 parts = cell2mat(parts_all(:, 1:3));
 
@@ -59,8 +59,8 @@ data_out = struct( ...
     'mass', mass, ...
     'rocket_length', rocket_length ...
     );
-data_out.stage_cp_tot  =  stage_cp_tot;
-data_out.stage_cna_tot =  stage_cna_tot;
+% data_out.stage_cp_tot  =  stage_cp_tot;
+% data_out.stage_cna_tot =  stage_cna_tot;
 data_out.aero_sections =  aero_sections;
 data_out.parts_all     =  parts_all;
 data_out.shear_all     =  shear_all;

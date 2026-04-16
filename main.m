@@ -4,7 +4,7 @@ M0 = 340.3; % Mach at sea level [m/s]
 rho = 0.95; % [kg m^-3]
 
 alpha = deg2rad(15); % Angle of Attack
-v = 1.5*M0; % Speed
+v = 2*M0; % Speed
 
 stages = [1 2];
 
@@ -19,14 +19,15 @@ filename = "C:\Users\thewo\Downloads\HeliosRocketV3.ork";
 % filename   = "V4 (30k) RAS Test Rocket.ork";
 % filename = "Rocket 2024-2025_V17.ork";
 
-ork = load_ork(filename);
+bigork = load_ork(filename);
+ork = [bigork(stages).Components];
 sections = load_sections(ork);
 
 R_ref = get_R_ref(sections);
 M = v / M0;
 
 fig_idx = 1;
-data = run_calc(ork, M, alpha, v, rho, stages, R_ref);
+data = run_calc(ork, sections, M, alpha, v, rho, stages, R_ref);
 plot_bending(ork, M, alpha, stages, data, filename, fig_idx);
 fig_idx = fig_idx + 1;
 

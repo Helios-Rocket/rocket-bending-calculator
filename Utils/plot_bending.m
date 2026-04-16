@@ -17,7 +17,7 @@ ax1 = axes( ...
 hold(ax1, 'on')
 
 axes(ax1)
-plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg, data.stage_cp_tot, false)
+plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg)
 
 ax1.XLim = [0, data.rocket_length];
 axis(ax1, 'equal')
@@ -98,7 +98,7 @@ ax1 = axes( ...
 hold(ax1, 'on')
 
 axes(ax1)
-plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg, data.stage_cp_tot, false)
+plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg)
 
 ax1.XLim = [0, data.rocket_length];
 axis(ax1, 'equal')
