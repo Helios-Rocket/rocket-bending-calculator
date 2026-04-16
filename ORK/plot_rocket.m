@@ -1,10 +1,10 @@
-function plot_rocket(filename, stages, yscale, ork, cp_tot, cg)
-plot_ork(ork, stages, yscale);
+function plot_rocket(yscale, ork, cp_tot, cg)
+plot_ork(ork, yscale);
 
-num_stages = numel(stages);
-num_stages_real = numel(ork);
-colors = turbo(num_stages + 1);
-lw = 3;
+% num_stages = numel(stages);
+% num_stages_real = numel(ork);
+% colors = turbo(num_stages + 1);
+% lw = 3;
 
 plot(cp_tot, 0, '.r', 'MarkerSize', 30, 'DisplayName', 'Center of Pressure')
 plot(cp_tot, 0, 'or', 'MarkerSize', 14, 'LineWidth', 1, 'HandleVisibility', 'off')

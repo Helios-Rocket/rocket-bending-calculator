@@ -3,20 +3,19 @@ SetupEnv;
 M0 = 340.3; % Mach at sea level [m/s]
 rho = 0.95; % [kg m^-3]
 
-alpha = deg2rad(15); % Angle of Attack
-v = 2*M0; % Speed
+alpha = deg2rad(5); % Angle of Attack
+v = 0.8*M0; % Speed
 
-stages = [1 2];
+stages = 1:2;
 
-% filename = "C:\Users\thewo\seadrive_root\SparrowTheNerd\My Libraries\Projects\Rockets\K2050 Submin\E.ork";
-filename = "C:\Users\thewo\Downloads\HeliosRocketV3.ork";
+filename = "HeliosRocketV3.ork";
 
 % [file, path] = uigetfile('*.ork');
 % filename = fullfile(path, file);
 
 % filename = "Voyager rough canards v2 (2).ork";
 % filename = "V9 (2-Stage 6in) Test Rocket.ork";
-% filename   = "V4 (30k) RAS Test Rocket.ork";
+% filename = "V4 (30k) RAS Test Rocket.ork";
 % filename = "Rocket 2024-2025_V17.ork";
 
 bigork = load_ork(filename);
@@ -27,8 +26,8 @@ R_ref = get_R_ref(sections);
 M = v / M0;
 
 fig_idx = 1;
-data = run_calc(ork, sections, M, alpha, v, rho, stages, R_ref);
-plot_bending(ork, M, alpha, stages, data, filename, fig_idx);
+data = run_calc(ork, sections, M, alpha, v, rho, R_ref);
+plot_bending(ork, M, alpha, data, filename, fig_idx);
 fig_idx = fig_idx + 1;
 
 %{
@@ -52,7 +51,7 @@ for n = 1:num
     for i = 1:num
         alpha = alpha_all(i);
 
-        data = run_calc(ork, M, alpha, v0, rho, stages, R_ref);
+        data = run_calc(ork, sections, M, alpha, v0, rho, R_ref);
 
         cna_all(i, n) = data.cna_tot * alpha;
     end

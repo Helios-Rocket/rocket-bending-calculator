@@ -1,26 +1,9 @@
-function plot_sections(sections, stages, yscale)
-
-if nargin < 2
-    stages = 1:10;
-end
+function plot_sections(sections, yscale)
 
 num_sections = numel(sections);
 
-% for section_idx = 1:num_sections
-%     if ~isempty(find(stages == sections{section_idx}.stage, 1))
-%         x_start = sections{section_idx}.x;
-%         break
-%     end
-% end
-
 for idx = 1:num_sections
     section = sections{idx};
-
-    % if isempty(find(stages == section.stage, 1))
-    %     continue
-    % end
-
-    % section.x = section.x - x_start;
 
     x_points = [section.x, section.x, section.x + section.length, section.x + section.length];
     y_points = [-section.forerad, section.forerad, section.aftrad+eps, -section.aftrad-eps] / yscale;

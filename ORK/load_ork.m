@@ -5,13 +5,11 @@ unzip(filename, zip_out);
 ork_name = fullfile(zip_out, 'rocket.ork');
 
 rocket = parseORK(ork_name);
-% orkst = [orkst(:).Components];
 
-% rocket = ork.rocket;
 rmdir('temp', 's');
 end
 
-function S = parseORK(filename)
+function S = parseORK(filename) % thanks ChatGPT :)
 %PARSEORK Parse OpenRocket .ork file with multi-stage support
 %
 % Output:

@@ -6,20 +6,9 @@ aero_sections = {};
 
 x_start = 0;
 
-% for section_idx = 1:num_sections
-%     if ~isempty(find(stages == sections{section_idx}.stage, 1))
-%         x_start = sections{section_idx}.x;
-%         break
-%     end
-% end
-
 for section_idx = 1:num_sections
     section = sections{section_idx};
 
-    % if isempty(find(stages == section.stage, 1))
-    %     continue
-    % end
-    
     section.x = section.x - x_start;
     if (isfield(section,'subcomponents') && ((isfield(section.subcomponents, 'trapezoidfinset') || isfield(section.subcomponents, 'freeformfinset'))))
         subcomponents = section.subcomponents;
@@ -123,6 +112,7 @@ for section_idx = 1:num_sections
             'length', section.length);
 
         aero_section_idx = aero_section_idx + 1;
+
     elseif section.forerad < section.aftrad
         CNa = calc_CNa_shoulder(section.forerad, section.aftrad, R_ref);
         Cp  = calc_CP_shoulder (section.forerad, section.aftrad, section.length, section.x, alpha);
@@ -136,8 +126,9 @@ for section_idx = 1:num_sections
             'length', section.length, ...
             'd', 0, ...
             'D', inf);
-        
+
         aero_section_idx = aero_section_idx + 1;
+
     elseif section.forerad > section.aftrad
         CNa = calc_CNa_boattail(section.forerad, section.aftrad, section.length, R_ref, M);
         Cp  = calc_CP_boattail (section.forerad, section.aftrad, section.length) + section.x;
@@ -151,16 +142,12 @@ for section_idx = 1:num_sections
             'length', section.length, ...
             'd', section.aftrad*2, ...
             'D', section.outer_radius*2);
-        aero_section_idx = aero_section_idx + 1; 
+        aero_section_idx = aero_section_idx + 1;
     end
 end
 
 num_aero_sections = aero_section_idx - 1;
 
-% num_stages = numel(ork);
-
-% stage_cp_tot  = zeros(num_stages, 1);
-% stage_cna_tot = zeros(num_stages, 1);
 cp_tot = 0;
 cna_tot = 0;
 
@@ -174,9 +161,5 @@ for n = 1:num_aero_sections
     cna_tot = cna_tot +    CNa;
 end
 
-% cna_tot = sum(stage_cna_tot);
 cp_tot  = cp_tot / cna_tot;
-
-% stage_cp_tot = stage_cp_tot ./ stage_cna_tot;
-
 end

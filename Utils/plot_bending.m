@@ -1,4 +1,4 @@
-function plot_bending(ork, Mach, alpha, stages, data, filename, fig_idx)
+function plot_bending(ork, Mach, alpha, data, filename, fig_idx)
 
 if nargin < 7
     fig_idx = 1;
@@ -17,7 +17,7 @@ ax1 = axes( ...
 hold(ax1, 'on')
 
 axes(ax1)
-plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg)
+plot_rocket(1, ork, data.cp_tot, data.cg)
 
 ax1.XLim = [0, data.rocket_length];
 axis(ax1, 'equal')
@@ -98,7 +98,7 @@ ax1 = axes( ...
 hold(ax1, 'on')
 
 axes(ax1)
-plot_rocket(filename, stages, 1, ork, data.cp_tot, data.cg)
+plot_rocket(1, ork, data.cp_tot, data.cg)
 
 ax1.XLim = [0, data.rocket_length];
 axis(ax1, 'equal')

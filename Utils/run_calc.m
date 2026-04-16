@@ -1,4 +1,4 @@
-function data_out = run_calc(ork, sections, Mach, alpha, v, rho, stages, R_ref, num_points)
+function data_out = run_calc(ork, sections, Mach, alpha, v, rho, R_ref, num_points)
 
 S = pi * R_ref^2;
 
@@ -12,20 +12,6 @@ parts = cell2mat(parts_all(:, 1:3));
 R = calc_R_all(aero_sections, S, v, rho, alpha, I, cg);
 
 rocket_length = max(parts(:, 3));
-
-%{
-part_stages = cell2mat(parts_all(:, 6));
-num_stages = length(stages);
-
-if num_stages > 1
-    rocket_length = 0;
-    for n = 1:num_stages
-        rocket_length = max(rocket_length, max(parts(part_stages == stages(n), 3)));
-    end
-else
-    rocket_length = max(parts(part_stages == stages, 3));
-end
-%}
 
 if nargin < 9
     num_points = 1000;
@@ -59,8 +45,7 @@ data_out = struct( ...
     'mass', mass, ...
     'rocket_length', rocket_length ...
     );
-% data_out.stage_cp_tot  =  stage_cp_tot;
-% data_out.stage_cna_tot =  stage_cna_tot;
+
 data_out.aero_sections =  aero_sections;
 data_out.parts_all     =  parts_all;
 data_out.shear_all     =  shear_all;
@@ -68,6 +53,5 @@ data_out.bending_all   =  bending_all;
 data_out.stress_all    = stress_all;
 data_out.points        = points;
 data_out.thickness     = thickness_all;
-
 
 end
