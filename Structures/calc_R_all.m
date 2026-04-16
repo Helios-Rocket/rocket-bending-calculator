@@ -1,18 +1,18 @@
 function R = calc_R_all(aero_sections, S, V, rho, alpha, I, cg)
 
-    q = 0.5*rho*V^2;
+q = 0.5*rho*V^2;
 
-    num_sections = numel(aero_sections);
-    R = 0;
-    
-    for n = 1:num_sections
-        section = aero_sections{n};
-        N = calc_N(q, S, alpha, section.CNa);
+num_sections = numel(aero_sections);
+R = 0;
 
-        L = cg - section.Cp;
+for n = 1:num_sections
+    section = aero_sections{n};
+    N = calc_N(q, S, alpha, section.CNa);
 
-        R = R + L * N;
-    end
+    L = cg - section.Cp;
 
-    R = R / I;
+    R = R + L * N;
+end
+
+R = R / I;
 end

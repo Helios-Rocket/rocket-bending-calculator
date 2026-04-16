@@ -1,26 +1,9 @@
-function plot_sections(sections, stages, yscale)
-
-if nargin < 2
-    stages = 1:10;
-end
+function plot_sections(sections, yscale)
 
 num_sections = numel(sections);
 
-for section_idx = 1:num_sections
-    if ~isempty(find(stages == sections{section_idx}.stage, 1))
-        x_start = sections{section_idx}.x;
-        break
-    end
-end
-
 for idx = 1:num_sections
     section = sections{idx};
-
-    if isempty(find(stages == section.stage, 1))
-        continue
-    end
-
-    section.x = section.x - x_start;
 
     x_points = [section.x, section.x, section.x + section.length, section.x + section.length];
     y_points = [-section.forerad, section.forerad, section.aftrad+eps, -section.aftrad-eps] / yscale;
@@ -52,7 +35,7 @@ for idx = 1:num_sections
 
             x0 = section.x + finset.axialoffset.Text;
 
-            if strcmp(finset.axialoffset.methodAttribute, 'bottom')
+            if strcmp(finset.axialoffset.method, 'bottom')
                 x0 = x0 + section.length - cr;
             end
             
@@ -66,10 +49,10 @@ for idx = 1:num_sections
             plot(polyshape(x_points, y_bottom), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
         elseif isfield(subcomponents, 'freeformfinset')
             finset = section.subcomponents.freeformfinset;
-
-            x0 = section.x + section.length + finset.axialoffset.Text - tail([section.subcomponents.freeformfinset.finpoints.point.xAttribute]',1);
-            x_points = [section.subcomponents.freeformfinset.finpoints.point.xAttribute] + x0;
-            y_points = ([section.subcomponents.freeformfinset.finpoints.point.yAttribute] + section.forerad) / yscale;
+            points = [finset.finpoints.point{:}];
+            x0 = section.x + section.length + finset.axialoffset.Text - tail([points.x]',1);
+            x_points = [points.x] + x0;
+            y_points = ([points.y] + section.forerad) / yscale;
 
             plot(polyshape(x_points, y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on
             plot(polyshape(x_points, -y_points), 'FaceColor', color/2, 'LineStyle', 'none', 'HandleVisibility', 'off'); hold on

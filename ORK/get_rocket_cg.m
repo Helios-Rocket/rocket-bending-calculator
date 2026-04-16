@@ -1,10 +1,20 @@
-function [cg, mass, parts, I] = get_rocket_cg(ork, target_stages, verbose)
+function [cg, mass, parts, I] = get_rocket_cg(ork, verbose)
 
-if nargin < 3
+if nargin < 2
     verbose = false;
 end
 
-[cg_num, cg_den, parts] = get_component_cg(ork.subcomponents, 0, 0);
+cg_num = 0;
+cg_den = 0;
+parts = {};
+X = 0;
+for ii = 1:size(ork,2)
+    [cg_num_s, cg_den_s, parts_s] = get_component_cg(ork(ii).Data, X, 0, 0);
+    X = parts_s{1,3};
+    cg_num = cg_num + cg_num_s;
+    cg_den = cg_den + cg_den_s;
+    parts = [parts; parts_s];
+end
 
 cg = cg_num / cg_den;
 mass  = cg_den;
@@ -12,43 +22,6 @@ mass  = cg_den;
 I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
     function [cg_num, cg_den, parts] = get_component_cg(component, x0, parent_length, parent_radius)
-
-        if isfield(component, 'stage')
-            stages = component.stage;
-            cg_num = 0;
-            cg_den = 0;
-            x      = 0;
-            parts = {};
-            num_stages = numel(stages);
-            for n = 1:num_stages
-                stage_idx = num_stages + 1 - n;
-                if length(target_stages) > 1
-                    if ~find(target_stages, stage_idx)
-                        continue
-                    end
-                else
-                    if target_stages ~= stage_idx
-                        continue
-                    end
-                end
-                comp_length = get_component_length(stages(n));
-
-                [cg_num_s, cg_den_s, stage_parts] = get_component_cg(stages(n), x, comp_length);
-
-                for i = 1:length(stage_parts)
-                    stage_parts{i, 6} = n;
-                end
-
-                x = x + comp_length;
-
-                cg_num = cg_num + cg_num_s;
-                cg_den = cg_den + cg_den_s;
-
-                parts = [parts; stage_parts];
-            end
-            return
-        end
-
 
         if isfield(component, 'length')
             comp_length = component.length;
@@ -65,13 +38,13 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
 
         if isfield(component, 'axialoffset')
             x = x + component.axialoffset.Text;
-            if strcmp(component.axialoffset.methodAttribute, 'bottom')
+            if strcmp(component.axialoffset.method, 'bottom')
                 x = x - comp_length + parent_length;
-            elseif strcmp(component.axialoffset.methodAttribute, 'middle')
+            elseif strcmp(component.axialoffset.method, 'middle')
                 x = x + parent_length/2;
                 cg_loc = 0;
                 end_length = comp_length/2;
-            elseif strcmp(component.axialoffset.methodAttribute, 'absolute')
+            elseif strcmp(component.axialoffset.method, 'absolute')
                 x = x - x0;
             end
         end
@@ -92,17 +65,18 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         elseif isfield(component, 'fincount')
             k = 0.6;
             if(isfield(component, 'finpoints')) % if fins are freeform
-                area = polyarea([component.finpoints.point.xAttribute],[component.finpoints.point.yAttribute]);
-                fillet_volume = k * tail([component.finpoints.point.xAttribute]',1) * component.filletradius^2 * (1 - pi/4);
+                points = [component.finpoints.point{:}];
+                area = polyarea([points.x],[points.y]);
+                fillet_volume = k * tail([points.x]',1) * component.filletradius^2 * (1 - pi/4);
             else
                 area = 0.5 * (component.rootchord + component.tipchord) * component.height;
                 fillet_volume = k * component.rootchord * component.filletradius^2 * (1 - pi/4);
             end
             volume = area * component.thickness;
 
-            m_fin = volume * component.material.densityAttribute;
-            
-            m_fillet      = fillet_volume * component.filletmaterial.densityAttribute;
+            m_fin = volume * component.material.density;
+
+            m_fillet = fillet_volume * component.filletmaterial.density;
 
             m = m_fin + m_fillet*2;
 
@@ -121,7 +95,7 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
                     volume = volume - inner_volume;
                 end
 
-                m = volume * component.material.densityAttribute;
+                m = volume * component.material.density;
             end
         elseif isfield(component, 'radius')
             area = pi*radius^2;
@@ -134,9 +108,9 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
                 volume = volume - inner_volume;
             end
 
-            m = volume * component.material.densityAttribute;
+            m = volume * component.material.density;
         elseif isfield(component, 'packedradius')
-            
+
             packedradius = component.packedradius;
 
             if ~isnumeric(packedradius)
@@ -147,14 +121,16 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
             area = pi * packedradius^2;
             volume = area * component.packedlength;
 
-            m = volume * component.material.densityAttribute;
+            m = volume * component.material.density;
         else
             m = 0;
         end
 
+        % if ~iscell(component)
         if verbose
             fprintf("%s : %0.2f cm\n", component.name, x*100)
         end
+        % end
 
         if isfield(component, 'shape')
             if strcmp(component.shape, 'ogive')
@@ -162,7 +138,7 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
             end
         end
         x_end = x + end_length;
-        
+
         cg_x = x + cg_loc;
 
         if isa(m, 'missing')
@@ -179,13 +155,13 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         part = {cg_x, m, x_end, component.id, component.name};
         parts = part;
 
-        if isfield(component, 'subcomponents')
+        if isfield(component,'subcomponents')
             subc_list = component.subcomponents;
 
             fields = fieldnames(subc_list);
             length_before = 0;
 
-            for nf = 1:numel(fields)
+            for nf = 1:size(fields,1)
                 name = fields{nf};
                 subc = subc_list.(name);
 
@@ -195,16 +171,31 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
                         len_add = 0;
                     end
 
-                    [cg_num_sub, cg_den_sub, sub_parts] = get_component_cg(subc(n), x + len_add, comp_length, radius);
+                    if iscell(subc)
+                        subcn = subc{n};
+                    else
+                        subcn = subc(n);
+                    end
+
+                    [cg_num_sub, cg_den_sub, sub_parts] = get_component_cg(subcn, x + len_add, comp_length, radius);
                     cg_num = cg_num + cg_num_sub;
                     cg_den = cg_den + cg_den_sub;
 
                     parts = [parts; sub_parts];
-                    
+
                     if ~(strcmp(name, 'tubecoupler') || strcmp(name, 'railbutton') || strcmp(name, 'bulkhead') || strcmp(name, 'innertube'))
-                        length_before = length_before + get_component_length(subc(n));
+                        length_before = length_before + get_component_length(subcn);
                     end
                 end
+            end
+        end
+
+        % else
+        if isfield(component,'Data')
+            for i = 1:1:size(component,2)
+                [cg_num, cg_den, sub_parts] = get_component_cg(component(i).Data, 0, parent_length, 0);
+                parts = [parts; sub_parts];
+                % get_component_cg(component, x0, parent_length, parent_radius)
             end
         end
     end
