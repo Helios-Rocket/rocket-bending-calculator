@@ -117,8 +117,9 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
             elseif isfield(component, 'fincount')
                 k = 0.6;
                 if(isfield(component, 'finpoints')) % if fins are freeform
-                    area = polyarea([component.finpoints.point.x],[component.finpoints.point.y]);
-                    fillet_volume = k * tail([component.finpoints.point.x]',1) * component.filletradius^2 * (1 - pi/4);
+                    points = [component.finpoints.point{:}];
+                    area = polyarea([points.x],[points.y]);
+                    fillet_volume = k * tail([points.x]',1) * component.filletradius^2 * (1 - pi/4);
                 else
                     area = 0.5 * (component.rootchord + component.tipchord) * component.height;
                     fillet_volume = k * component.rootchord * component.filletradius^2 * (1 - pi/4);
