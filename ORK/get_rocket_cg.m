@@ -79,10 +79,10 @@ I = sum(cell2mat(parts(:, 2)) .* (cell2mat(parts(:, 1)) - cg).^2);
         radius = 0;
 
         if isfield(component, 'outerradius')
-            radius = remove_auto(component.outerradius);
+            radius = remove_auto(component.outerradius, parent_radius);
 
         elseif isfield(component, 'radius')
-            radius = remove_auto(component.radius);
+            radius = remove_auto(component.radius, parent_radius);
         end
 
         if isfield(component, 'mass')

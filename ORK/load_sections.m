@@ -48,6 +48,12 @@ for stage_num = 1:num_stages
 
             material = stage_subcomp.transition.material.Text;
 
+            if isfield(stage_subcomp.transition, 'subcomponents')
+                tr_sub = stage_subcomp.transition.subcomponents;
+            else
+                tr_sub = 'missing';
+            end
+
             sections{section_idx} = struct( ...
                 'x', x_pos, ...
                 'length', trans_length, ...
@@ -58,7 +64,7 @@ for stage_num = 1:num_stages
                 'stage', num_stages - stage_num + 1, ...
                 'id', stage_subcomp.transition.id, ...
                 'outer_radius', min(forerad, aftrad) + stage_subcomp.transition.thickness, ...
-                'subcomponents', stage_subcomp.transition.subcomponents);
+                'subcomponents', tr_sub);
             x_pos = x_pos + trans_length;
             section_idx = section_idx + 1;
         end
